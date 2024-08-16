@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Model Viewer Links</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .view-3d-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>3D Model Viewer</h1>
+    <button class="view-3d-btn" onclick="openModelViewer('moonalisaframe')">View Moona Lisa Frame</button>
+    <button class="view-3d-btn" onclick="openModelViewer('nef')">View NEF</button>
+    <button class="view-3d-btn" onclick="openModelViewer('boysoldierbody')">View Boy Soldier Body</button>
+    <button class="view-3d-btn" onclick="openModelViewer('liberty')">View Liberty</button>
+    <button class="view-3d-btn" onclick="openModelViewer('lamoree')">View Lamoree</button>
+    <button class="view-3d-btn" onclick="openModelViewer('boysoldiergreen')">View Boy Soldier Green</button>
+    <button class="view-3d-btn" onclick="openModelViewer('boysoldierchrome')">View Boy Soldier Chrome</button>
+    <button class="view-3d-btn" onclick="openModelViewer('boysoldiergold')">View Boy Soldier Gold</button>
+    <button class="view-3d-btn" onclick="openModelViewer('soldiergnsglb')">View Soldier G&S</button>
+
+    <script>
+    function openModelViewer(modelName) {
+        window.open(`model-viewer.html?model=${modelName}`, '_blank');
+    }
+    </script>
+</body>
+</html>
