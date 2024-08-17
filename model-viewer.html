@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Model Viewer</title>
+    <title>Optimized 3D Model Viewer</title>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -49,10 +49,22 @@
         .img-icn1 {
             height: 20px;
         }
+        #loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <button class="close-btn" onclick="window.close()">Close</button>
+    <div id="loading-indicator">Loading model...</div>
     <model-viewer id="modelViewer" ar camera-controls touch-action="pan-y" alt="A 3D model"
                   background-color="#92002d" autoplay>
         <button slot="ar-button" class="threed1">
@@ -65,6 +77,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const modelName = urlParams.get('model');
             const modelViewer = document.getElementById('modelViewer');
+            const loadingIndicator = document.getElementById('loading-indicator');
             
             const modelUrls = {
                 'moonalisaframe': 'https://d19hzwy5eq5l28.cloudfront.net/Moona+Lisa+Poster.glb',
@@ -139,13 +152,59 @@
             };
             
             if (modelName && modelUrls[modelName]) {
-                modelViewer.src = modelUrls[modelName];
+                loadModel(modelUrls[modelName]);
                 document.title = `3D Model Viewer - ${modelName}`;
             } else {
-                modelViewer.src = modelUrls['Angel'];  // Default to Angel if no valid model is specified
+                loadModel(modelUrls['Angel']);  // Default to Angel if no valid model is specified
                 document.title = "3D Model Viewer";
             }
+
+            function loadModel(url) {
+                loadingIndicator.style.display = 'block';
+                
+                // Preload the model
+                modelViewer.preload = true;
+                modelViewer.src = url;
+
+                // Listen for the 'load' event
+                modelViewer.addEventListener('load', function() {
+                    loadingIndicator.style.display = 'none';
+                });
+
+                // Listen for the 'error' event
+                modelViewer.addEventListener('error', function(error) {
+                    console.error('Error loading model:', error);
+                    loadingIndicator.textContent = 'Error loading model';
+                });
+            }
+
+            // Implement lazy loading for multiple models
+            if ('IntersectionObserver' in window) {
+                let observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            let lazyModel = entry.target;
+                            lazyModel.src = lazyModel.dataset.src;
+                            observer.unobserve(lazyModel);
+                        }
+                    });
+                });
+
+                document.querySelectorAll('model-viewer[data-src]').forEach(lazyModel => {
+                    observer.observe(lazyModel);
+                });
+            }
         });
+
+        // Implement caching
+        if ('caches' in window) {
+            caches.open('model-cache').then(cache => {
+                // Cache the models
+                Object.values(modelUrls).forEach(url => {
+                    cache.add(url);
+                });
+            });
+        }
     </script>
 </body>
 </html>
